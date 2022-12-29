@@ -1,0 +1,41 @@
+{
+  "name": "projeto-06---typescript-e-mongo-db",
+  "version": "1.0.0",
+  "description": "Aplicação Web com admin integrado",
+  "main": "app.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "ts-node app.ts",
+    "start-dev": "ts-node-dev app.ts"
+  },
+  "author": "Gabriela Lemos",
+  "license": "ISC",
+  "dependencies": {
+    "@adminjs/express": "^5.0.1",
+    "@adminjs/mongoose": "^3.0.1",
+    "@adminjs/sequelize": "^3.0.0",
+    "@tiptap/prosemirror-tables": "^1.1.3",
+    "adminjs": "^6.7.0",
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "express-formidable": "^1.2.0",
+    "express-mysql-session": "^2.1.8",
+    "express-session": "^1.17.3",
+    "mongoose": "^6.8.0",
+    "mysql2": "^2.3.3",
+    "sequelize": "^6.27.0",
+    "ts-node-dev": "^2.0.0",
+    "tslib": "^2.4.1",
+    "typescript": "^4.9.4"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.2",
+    "@types/cors": "^2.8.13",
+    "@types/express": "^4.17.15",
+    "@types/express-session": "^1.17.5",
+    "sequelize-cli": "^6.5.2",
+    "ts-node": "^10.9.1"
+  }
+}
