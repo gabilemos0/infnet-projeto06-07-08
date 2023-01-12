@@ -12,17 +12,29 @@ document.get('/', async (req, res) => {
 })
 
 document.get('/:id', async (req, res) => {
+  if (req.params.id === '0') {
+    res.json({})
+    return
+  }
   const result = await documentCtrl.getDocument(req.params.id)
   res.statusCode = result.status
   res.json(result)
 })
 
 document.post('/', async (req, res) => {
-  res.json({})
+  const result = await documentCtrl.createDocument(req.body)
+  res.statusCode = result.status
+  res.json(result)
 })
 
 document.patch('/:id', async (req, res) => {
   const result = await documentCtrl.updateDocument(req.params.id, req.body)
+  res.statusCode = result.status
+  res.json(result)
+})
+
+document.delete('/:id', async (req, res) => {
+  const result = await documentCtrl.deleteDocument(req.params.id)
   res.statusCode = result.status
   res.json(result)
 })

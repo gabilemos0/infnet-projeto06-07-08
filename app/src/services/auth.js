@@ -41,4 +41,4 @@ const getUser = () => {
   return JSON.parse(window.localStorage.getItem('user'))
 }
 
-export { login, register, userIsLoggedIn, getUser, logout }
+export { login, register, userIsLoggedIn, logout, getUser }

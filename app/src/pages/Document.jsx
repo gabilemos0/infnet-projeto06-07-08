@@ -1,6 +1,6 @@
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { useEffect, useRef, useState } from 'react'
-// import { userIsLoggedIn } from '../services/auth'
+import { userIsLoggedIn, getUser } from '../services/auth'
 
 import { Editor } from '@tinymce/tinymce-react'
 
@@ -19,40 +19,60 @@ const Document = ({ setCurrentRoute }) => {
 
   const navigate = useNavigate()
   const params = useParams()
+  const user = getUser()
+
   const [title, setTitle] = useState('')
   const [content, setContent] = useState('')
 
   const { data } = useSWR(
-    `http://localhost:3001/document/${params.id}`,
+    `http://localhost:3001/document/${params.id === undefined ? 0 : params.id}`,
     fetcher,
     { refreshInterval: 5000 }
   )
 
   const loadingDocument = async () => {
-    setTitle(data.document.title)
-    setContent(data.document.content)
+    if (params.id !== undefined) {
+      setTitle(data.document.title)
+      setContent(data.document.content)
+    }
   }
 
   useEffect(() => {
     loadingDocument()
   }, [data])
 
-  const updateDocument = () => {
-    fetch(`http://localhost:3001/document/${params.id}`, {
-      method: 'PATCH',
-      body: JSON.stringify({
-        title,
-        content: editorRef.current.getContent()
-      }),
-      headers: {
-        'Content-type': 'application/json; charset=UTF-8'
-      }
-    })
+  const updateDocument = async () => {
+    if (params.id !== undefined) {
+      await fetch(`http://localhost:3001/document/${params.id}`, {
+        method: 'PATCH',
+        body: JSON.stringify({
+          title,
+          content: editorRef.current.getContent()
+        }),
+        headers: {
+          'Content-type': 'application/json; charset=UTF-8'
+        }
+      })
+    } else {
+      const response = await fetch(`http://localhost:3001/document`, {
+        method: 'POST',
+        body: JSON.stringify({
+          title,
+          content: editorRef.current.getContent(),
+          user_id: user.id
+        }),
+        headers: {
+          'Content-type': 'application/json; charset=UTF-8'
+        }
+      })
+      const data = await response.json()
+      navigate(`/document/${data._id}`)
+    }
   }
 
-  // useEffect(() => {
-  //   userIsLoggedIn(navigate, null)
-  // }, [])
+  useEffect(() => {
+    userIsLoggedIn(navigate, null)
+  }, [])
 
   return (
     <Box
@@ -64,7 +84,7 @@ const Document = ({ setCurrentRoute }) => {
         style={{
           marginBottom: 16
         }}
-        label={'Título'}
+        label={'Title'}
         fullWidth={true}
         value={title}
         onChange={e => setTitle(e.target.value)}
@@ -89,8 +109,14 @@ const Document = ({ setCurrentRoute }) => {
             'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }'
         }}
       />
-      <Button variant="contained" onClick={updateDocument}>
-        Clicar
+      <Button
+        variant="contained"
+        onClick={updateDocument}
+        style={{
+          marginTop: 16
+        }}
+      >
+        Atualizar
       </Button>
     </Box>
   )

@@ -31,6 +31,10 @@ function App() {
             element={<Documents setCurrentRoute={setCurrentRoute} />}
           />
           <Route
+            path="/document"
+            element={<Document setCurrentRoute={setCurrentRoute} />}
+          />
+          <Route
             path="/document/:id"
             element={<Document setCurrentRoute={setCurrentRoute} />}
           />

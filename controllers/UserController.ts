@@ -2,7 +2,17 @@ import { User } from '../models/user.entity'
 import { Op } from 'sequelize'
 import bcrypt from 'bcryptjs'
 
+import Mail from '../util/Email'
+
 class UserController {
+  mail: any
+
+  constructor() {
+    let root_dir = __dirname
+    root_dir = root_dir.replace('controllers', '').replace('/controllers', '')
+    this.mail = new Mail(root_dir)
+  }
+
   async login(userEmail: string, password: string) {
     let user = await User.findOne({
       where: {
@@ -14,6 +24,57 @@ class UserController {
       if (verify) return user
     }
     return null
+  }
+
+  async register(
+    username: string,
+    name: string,
+    email: string,
+    password: string
+  ) {
+    let token = await bcrypt.hashSync(`${username}_${name}`, 10)
+    let pass = await bcrypt.hashSync(password, 10)
+
+    await User.create({
+      username: username,
+      name: name,
+      email: email,
+      password: pass,
+      active: false,
+      token: token,
+      role_id: 3,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    })
+
+    this.mail.sendEmail(email, 'Confirmação de e-mail', 'token-email', {
+      name,
+      token,
+      url: process.env.URL
+    })
+    return true
+  }
+
+  async confirmEmail(token: any) {
+    let user = await User.findOne({
+      where: {
+        token
+      }
+    })
+    if (user) {
+      User.update(
+        {
+          active: true
+        },
+        {
+          where: {
+            id: user.id
+          }
+        }
+      )
+      return true
+    }
+    return false
   }
 }
 

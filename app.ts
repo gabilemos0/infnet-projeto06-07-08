@@ -17,11 +17,16 @@ import UserController from './controllers/UserController'
 import { document } from './routes/document'
 import { auth } from './routes/auth'
 
+import hbs from 'hbs'
+const path = require('node:path')
+
 require('dotenv').config()
 
 const mysqlStore = require('express-mysql-session')(session)
 
 const { PORT } = process.env
+
+const ROOT_DIR = __dirname
 
 const sessionStore = new mysqlStore({
   connectionLimit: 10,
@@ -152,6 +157,9 @@ const start = async () => {
       name: 'adminjs-internal-admin'
     }
   )
+
+  hbs.registerPartials(path.join(ROOT_DIR, 'views'))
+  app.set('view engine', '.hbs')
 
   app.use(cors())
   app.use(express.json())

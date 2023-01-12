@@ -6,20 +6,23 @@ import {
   Select,
   MenuItem,
   FormControl,
-  InputLabel
+  InputLabel,
+  Fab
 } from '@mui/material'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { ListViewer } from '../components'
-import { Edit, Delete } from '@mui/icons-material'
-import { useState } from 'react'
+import { Edit, Delete, Add } from '@mui/icons-material'
+import { useState, useEffect } from 'react'
 import useSWR from 'swr'
+import { getUser, userIsLoggedIn } from '../services/auth'
+import axios from 'axios'
 
 const fetcher = (...args) => fetch(...args).then(res => res.json())
 
 const Documents = ({ setCurrentRoute }) => {
   const [page, setPage] = useState(1)
   const [limit, setLimit] = useState(5)
-  const user = { id: 5 }
+  const user = getUser()
 
   const navigate = useNavigate()
 
@@ -35,14 +38,31 @@ const Documents = ({ setCurrentRoute }) => {
   // const editDocument = id => {
   //   alert(`Document ${id} edited!`)
   // }
-  const deleteDocument = id => {
-    alert(`Document ${id} deleted!`)
+
+  const deleteDocument = async id => {
+    const conf = window.confirm('Tem certeza que deseja deletar?')
+
+    if (conf) {
+      try {
+        await axios({
+          method: 'delete',
+          url: `http://localhost:3001/document/${id}`,
+          headers: { 'Content-Type': 'application/json' }
+        })
+        alert('Documento deletado com sucesso!!!')
+      } catch (err) {
+        alert('Erro ao deletar documento.')
+      }
+    }
   }
+
+  useEffect(() => {
+    userIsLoggedIn(navigate, null)
+  }, [])
 
   const columns = [
     { headerName: 'ID', key: '_id', id: true },
     { headerName: 'Title', key: 'title', id: false },
-    { headerName: 'Content', key: 'content', id: false },
     { headerName: 'CreatedAt', key: 'createdAt', id: false },
     { headerName: 'UpdatedAt', key: 'updatedAt', id: false },
     {
@@ -73,63 +93,6 @@ const Documents = ({ setCurrentRoute }) => {
       }
     }
   ]
-
-  // const rows = [
-  //   {
-  //     id: 1,
-  //     title: 'Snow',
-  //     content: 'Aqui será o conteúdo do meu documento',
-  //     createdAt: '2022-12-15T13:43:00.522+00:00'
-  //   },
-  //   {
-  //     id: 2,
-  //     title: 'Lannister',
-  //     content: 'Aqui será o conteúdo do meu documento',
-  //     createdAt: '2022-12-15T13:43:00.522+00:00'
-  //   },
-  //   {
-  //     id: 3,
-  //     title: 'Lannister',
-  //     content: 'Aqui será o conteúdo do meu documento',
-  //     createdAt: '2022-12-15T13:43:00.522+00:00'
-  //   },
-  //   {
-  //     id: 4,
-  //     title: 'Stark',
-  //     content: 'Aqui será o conteúdo do meu documento',
-  //     createdAt: '2022-12-15T13:43:00.522+00:00'
-  //   },
-  //   {
-  //     id: 5,
-  //     title: 'Targaryen',
-  //     content: 'Aqui será o conteúdo do meu documento',
-  //     createdAt: '2022-12-15T13:43:00.522+00:00'
-  //   },
-  //   {
-  //     id: 6,
-  //     title: 'Melisandre',
-  //     content: 'Aqui será o conteúdo do meu documento',
-  //     createdAt: '2022-12-15T13:43:00.522+00:00'
-  //   },
-  //   {
-  //     id: 7,
-  //     title: 'Clifford',
-  //     content: 'Aqui será o conteúdo do meu documento',
-  //     createdAt: '2022-12-15T13:43:00.522+00:00'
-  //   },
-  //   {
-  //     id: 8,
-  //     title: 'Frances',
-  //     content: 'Aqui será o conteúdo do meu documento',
-  //     createdAt: '2022-12-15T13:43:00.522+00:00'
-  //   },
-  //   {
-  //     id: 9,
-  //     title: 'Roxie',
-  //     content: 'Aqui será o conteúdo do meu documento',
-  //     createdAt: '2022-12-15T13:43:00.522+00:00'
-  //   }
-  // ]
 
   const props = {
     style: {
@@ -217,7 +180,20 @@ const Documents = ({ setCurrentRoute }) => {
             </FormControl>
           </Stack>
         </Grid>
-        <Grid item xs={0} md={1}></Grid>
+        <Grid item xs={0} md={1}>
+          <Fab
+            onClick={() => navigate('/document')}
+            color="primary"
+            aria-label="add"
+            sx={{
+              position: 'fixed',
+              right: 16,
+              bottom: 16
+            }}
+          >
+            <Add />
+          </Fab>
+        </Grid>
       </Grid>
     </>
   )

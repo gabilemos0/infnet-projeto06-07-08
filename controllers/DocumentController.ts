@@ -6,6 +6,14 @@ class DocumentController extends GenericController {
     super()
   }
 
+  async createDocument(data: any) {
+    const doc = await Document.create(data)
+    return {
+      status: 200,
+      _id: doc.id
+    }
+  }
+
   async getDocument(_id: string) {
     const document = await Document.findById(_id)
 
